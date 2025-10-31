@@ -3,6 +3,7 @@
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs"
 import { Separator } from "@workspace/ui/components/separator"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail, SidebarTrigger } from "@workspace/ui/components/sidebar"
+import { cn } from "@workspace/ui/lib/utils"
 import { CreditCardIcon, InboxIcon, LayoutDashboardIcon, LibraryBigIcon, Mic, PaletteIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -61,6 +62,7 @@ export const DashboardSidebar = () => {
 
     return (
         <Sidebar className="group" collapsible="icon">
+            {/* Sidebar Header */}
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -99,6 +101,7 @@ export const DashboardSidebar = () => {
                                     <SidebarMenuButton
                                         asChild
                                         isActive={isActive(item.url)}
+                                        className={cn(isActive(item.url) && "bg-gradient-to-br from-secondary-foreground to-primary! text-primary-foreground! hover:to-foreground/90!")}
                                         tooltip={item.title}
                                     >
                                         <Link href={item.url}>
@@ -124,6 +127,7 @@ export const DashboardSidebar = () => {
                                     <SidebarMenuButton
                                         asChild
                                         isActive={isActive(item.url)}
+                                        className={cn(isActive(item.url) && "bg-gradient-to-br from-secondary-foreground to-primary! text-primary-foreground! hover:to-foreground/90!")}
                                         tooltip={item.title}
                                     >
                                         <Link href={item.url}>
@@ -148,6 +152,7 @@ export const DashboardSidebar = () => {
                                     <SidebarMenuButton
                                         asChild
                                         isActive={isActive(item.url)}
+                                        className={cn(isActive(item.url) && "bg-gradient-to-br from-secondary-foreground to-primary! text-primary-foreground! hover:to-foreground/90!")}
                                         tooltip={item.title}
                                     >
                                         <Link href={item.url}>
@@ -162,6 +167,8 @@ export const DashboardSidebar = () => {
                 </SidebarGroup>
 
             </SidebarContent>
+
+            {/* Sidebar Footer */}
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
