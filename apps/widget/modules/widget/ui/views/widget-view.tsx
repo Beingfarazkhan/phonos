@@ -1,11 +1,8 @@
 "use client"
 
-import { useVapi } from "@/modules/widget/hooks/use-vapi"
-
-import { WidgetFooter } from "@/modules/widget/ui/components/widget-footer"
-import { WidgetHeader } from "@/modules/widget/ui/components/widget-header"
-import { Hand } from 'lucide-react'
-
+import { useAtomValue } from "jotai"
+import { screenAtom } from "../../atoms/widget-atom"
+import { WidgetAuthScreen } from "../screens/widget-auth-screen"
 
 type WidgetViewProps = {
     organizationId: string
@@ -13,25 +10,22 @@ type WidgetViewProps = {
 
 export const WidgetView = ({ organizationId }: WidgetViewProps) => {
 
+    const screen = useAtomValue(screenAtom)
+
+    const screenComponents = {
+        "error": <p>Error</p>,
+        "loading": <p>Loading</p>,
+        "selection": <p>Selection</p>,
+        "voice": <p>Voice</p>,
+        "auth": <WidgetAuthScreen />,
+        "inbox": <p>Inbox</p>,
+        "chat": <p>Chat</p>,
+        "contact": <p>Contact</p>
+    }
 
     return (
         <div className="flex flex-col w-full min-h-screen border bg-card shadow-sm overflow-hidden">
-            {/* Header */}
-            <WidgetHeader className="rounded-b-2xl">
-                <div className="flex flex-col justify-between gap-y-2 px-3 py-6 font-semibold text-secondary">
-                    <p className="text-3xl ">Hi There <Hand className="inline" /></p>
-                    <p className="text-lg">How can we help you today?</p>
-                </div>
-            </WidgetHeader>
-
-            {/* Body */}
-            <div className="flex-1 p-4">
-                Widget Content - {organizationId}
-            </div>
-
-            {/* Footer */}
-            <WidgetFooter />
-
+            {screenComponents[screen]}
         </div>
     )
 }

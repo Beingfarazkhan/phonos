@@ -12,7 +12,7 @@ export default function Page({ searchParams }: WidgetProps) {
   const { organizationId } = use(searchParams)
 
   return (
-    // <WidgetView organizationId={organizationId} />
-    <WidgetDemoView organizationId={organizationId} />
+    <WidgetView organizationId={organizationId} />
+    // <WidgetDemoView organizationId={organizationId} />
   )
 }
