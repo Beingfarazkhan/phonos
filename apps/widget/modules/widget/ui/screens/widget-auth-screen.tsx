@@ -11,6 +11,8 @@ import { Button } from '@workspace/ui/components/button'
 
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header"
 import { Hand } from "lucide-react"
+import { useAtomValue, useSetAtom } from 'jotai'
+import { contactSessionIdAtomFamily, organizationIdAtom, screenAtom } from '../../atoms/widget-atom'
 
 
 const formSchema = z.object({
@@ -18,10 +20,11 @@ const formSchema = z.object({
     email: z.string().email("Invalid email address!")
 })
 
-// Sample organization id will be changed after sometime
-const organizationId = "12345"
 
 export const WidgetAuthScreen = () => {
+    const organizationId = useAtomValue(organizationIdAtom)
+    const setScreen = useSetAtom(screenAtom)
+    const setContactSessionId = useSetAtom(contactSessionIdAtomFamily(organizationId || ""))
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -34,7 +37,7 @@ export const WidgetAuthScreen = () => {
     const createContactSessions = useMutation(api.public.contactSessions.create)
 
     const submitHandler = async (values: z.infer<typeof formSchema>) => {
-        console.log(values)
+        if (!organizationId) return
         // await new Promise((resolve) => setTimeout(resolve, 5000))
         form.reset({ name: '', email: '' })
 
@@ -59,7 +62,8 @@ export const WidgetAuthScreen = () => {
             metadata
         })
 
-        console.log({ sessionId })
+        setContactSessionId(sessionId)
+        setScreen("loading")
     }
 
     return (

@@ -177,3 +177,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom classes */
+.animate-spin-slow {
+  animation: spin 2s linear infinite;
+}
