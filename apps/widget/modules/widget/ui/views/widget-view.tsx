@@ -5,6 +5,8 @@ import { screenAtom } from "../../atoms/widget-atom"
 import { WidgetAuthScreen } from "../screens/widget-auth-screen"
 import { WidgetErrorScreen } from "../screens/widget-error-screen"
 import { WidgetLoadingScreen } from "../screens/widget-loading-screen"
+import { WidgetSelectionScreen } from "../screens/widget-selection-screen"
+import { WidgetChatScreen } from "../screens/widget-chat-screen"
 
 type WidgetViewProps = {
     organizationId: string | null
@@ -17,11 +19,11 @@ export const WidgetView = ({ organizationId }: WidgetViewProps) => {
     const screenComponents = {
         "error": <WidgetErrorScreen />,
         "loading": <WidgetLoadingScreen organizationId={organizationId} />,
-        "selection": <p>Selection</p>,
+        "selection": <WidgetSelectionScreen />,
         "voice": <p>Voice</p>,
         "auth": <WidgetAuthScreen />,
         "inbox": <p>Inbox</p>,
-        "chat": <p>Chat</p>,
+        "chat": <WidgetChatScreen />,
         "contact": <p>Contact</p>
     }
 

@@ -4,7 +4,7 @@ import { ReactNode } from "react"
 export const WidgetHeader = ({ children, className }: { children: ReactNode, className?: string }) => {
     return (
         <header className={cn(
-            "bg-secondary-foreground",
+            "bg-secondary-foreground text-secondary",
             className
         )}>
             {children}
