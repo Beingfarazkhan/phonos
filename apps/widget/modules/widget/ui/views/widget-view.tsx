@@ -7,6 +7,8 @@ import { WidgetErrorScreen } from "../screens/widget-error-screen"
 import { WidgetLoadingScreen } from "../screens/widget-loading-screen"
 import { WidgetSelectionScreen } from "../screens/widget-selection-screen"
 import { WidgetChatScreen } from "../screens/widget-chat-screen"
+import { WidgetInboxScreen } from "../screens/widget-inbox-screen"
+import { WidgetHeaderFooterLayout } from "../../layouts/widget-header-footer-layout"
 
 type WidgetViewProps = {
     organizationId: string | null
@@ -19,10 +21,14 @@ export const WidgetView = ({ organizationId }: WidgetViewProps) => {
     const screenComponents = {
         "error": <WidgetErrorScreen />,
         "loading": <WidgetLoadingScreen organizationId={organizationId} />,
-        "selection": <WidgetSelectionScreen />,
+        "selection": <WidgetHeaderFooterLayout>
+            <WidgetSelectionScreen />
+        </WidgetHeaderFooterLayout>,
         "voice": <p>Voice</p>,
         "auth": <WidgetAuthScreen />,
-        "inbox": <p>Inbox</p>,
+        "inbox": <WidgetHeaderFooterLayout>
+            <WidgetInboxScreen />
+        </WidgetHeaderFooterLayout>,
         "chat": <WidgetChatScreen />,
         "contact": <p>Contact</p>
     }

@@ -6,6 +6,7 @@ import { Button } from "@workspace/ui/components/button"
 import { useMutation } from "convex/react"
 import { api } from "@workspace/backend/_generated/api"
 import { useState } from "react"
+import { WidgetFooter } from "../components/widget-footer"
 
 export const WidgetSelectionScreen = () => {
 
@@ -71,7 +72,7 @@ export const WidgetSelectionScreen = () => {
                     <ChevronRightIcon size={5} />
                 </Button>
             </div>
-
+            {/* <WidgetFooter /> */}
         </>
     )
 }

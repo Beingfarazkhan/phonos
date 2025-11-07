@@ -113,7 +113,7 @@ export const WidgetAuthScreen = () => {
                             </FormItem>
                         )}
                     />
-                    <Button type="submit" disabled={form.formState.isSubmitting} className='mt-4'>{form.formState.isSubmitting ? 'Submitting...' : 'Submit'}</Button>
+                    <Button type="submit" disabled={form.formState.isSubmitting} className='mt-4 bg-secondary-foreground'>{form.formState.isSubmitting ? 'Submitting...' : 'Submit'}</Button>
                 </form>
             </Form>
         </>

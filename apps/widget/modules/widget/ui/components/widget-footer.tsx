@@ -1,12 +1,14 @@
-
+"use client"
 import { Button } from "@workspace/ui/components/button"
 import { Inbox, Home } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { cn } from "@workspace/ui/lib/utils"
-import { useState } from "react"
+import { screenAtom } from "../../atoms/widget-atom"
+import { useAtom } from "jotai"
 
 export const WidgetFooter = () => {
-    const [active, setActive] = useState<"home" | "inbox">("home")
+    const [screen, setScreen] = useAtom(screenAtom)
+
     return (
         <div className="relative bg-secondary-foreground rounded-t-2xl h-16 flex items-center justify-around overflow-hidden">
             {/* Animated curved background */}
@@ -19,7 +21,7 @@ export const WidgetFooter = () => {
                 }}
                 className={cn(
                     "absolute top-0 h-[90%] w-[50vw] bg-card shadow-md",
-                    active === "home" ? "left-[0%]" : "left-[50%]",
+                    screen === "selection" ? "left-[0%]" : "left-[50%]",
                     "rounded-b-xl rounded-t-none"
                 )}
                 style={{
@@ -32,10 +34,10 @@ export const WidgetFooter = () => {
             <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => setActive("home")}
+                onClick={() => setScreen("selection")}
                 className={cn(
                     "group flex-1 h-full relative z-10 transition-colors duration-300 ",
-                    active === "home" ? "text-secondary-foreground" : "text-primary-foreground"
+                    screen === "selection" ? "text-secondary-foreground" : "text-primary-foreground"
                 )}
             >
                 <Home className="h-5 w-5 group-hover:scale-110 transition duration-200" />
@@ -44,10 +46,10 @@ export const WidgetFooter = () => {
             <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => setActive("inbox")}
+                onClick={() => setScreen("inbox")}
                 className={cn(
                     "group flex-1 h-full relative z-10 transition-colors duration-300",
-                    active === "inbox" ? "text-secondary-foreground" : "text-primary-foreground"
+                    screen === "inbox" ? "text-secondary-foreground" : "text-primary-foreground"
                 )}
             >
                 <Inbox className="h-5 w-5 group-hover:scale-110 transition duration-200" />
