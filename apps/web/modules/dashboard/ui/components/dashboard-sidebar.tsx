@@ -88,7 +88,7 @@ export const DashboardSidebar = () => {
                 </SidebarMenu>
             </SidebarHeader>
             {/* <SidebarTrigger>Trigger</SidebarTrigger> */}
-            <Separator />
+            <Separator className="mt-1" />
 
             <SidebarContent>
                 {/* Customer Support */}
