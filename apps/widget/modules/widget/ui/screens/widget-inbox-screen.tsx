@@ -43,7 +43,7 @@ export const WidgetInboxScreen = () => {
                     <Button
                         size={"icon"}
                         onClick={() => setScreen("selection")}
-                        variant={"ghost"}
+                        variant={"transparent"}
                     >
                         <ArrowLeftIcon />
                     </Button>

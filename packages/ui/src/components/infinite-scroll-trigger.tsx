@@ -35,7 +35,7 @@ export const InfiniteScrollTrigger = ({
                 disabled={isLoadingMore || !canLoadMore}
                 onClick={onLoadMore}
                 size={'sm'}
-                variant={"ghost"}
+                variant={"transparent"}
             >
                 {text}
             </Button>

@@ -6,6 +6,113 @@ import { components } from '../_generated/api';
 import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { Doc } from '../_generated/dataModel';
 
+export const updateStatus = mutation({
+    args:{
+        conversationId: v.id("conversations"),
+        status: v.union(
+            v.literal("resolved"),
+            v.literal("escalated"),
+            v.literal("unresolved")
+        )
+    },
+    handler: async(ctx, args)=>{
+        const identity = await ctx.auth.getUserIdentity()
+        
+        // Checking user existence
+        if(identity===null){
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message:"User Not Found!"
+            })
+        }
+
+        const orgId = identity.orgId as string
+
+        if(!orgId){
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message:"Organization Not Found!"
+            })
+        }
+
+        const conversation = await ctx.db.get(args.conversationId)
+
+        if(!conversation){
+            throw new ConvexError({
+                code: "NOT_FOUND",
+                message:"Conversation Not Found!"
+            })
+        }
+
+        if(conversation.organizationId !== orgId){
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message:"Invalid Organization ID!"
+            })
+        }
+
+        await ctx.db.patch(args.conversationId, {
+            status: args.status
+        })
+    }
+})
+
+export const getOne = query({
+    args:{
+        conversationId: v.id("conversations")
+    },
+    handler: async(ctx, args) =>{
+
+        const identity = await ctx.auth.getUserIdentity()
+        
+        // Checking user existence
+        if(identity===null){
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message:"User Not Found!"
+            })
+        }
+
+        const orgId = identity.orgId as string
+
+        if(!orgId){
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message:"Organization Not Found!"
+            })
+        }
+
+        const conversation = await ctx.db.get(args.conversationId)
+
+        if(!conversation){
+            throw new ConvexError({
+                code: "NOT_FOUND",
+                message:"Conversation Not Found!"
+            })
+        }
+
+        if(conversation.organizationId !== orgId){
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message:"Invalid Organization ID!"
+            })
+        }
+
+        const contactSession = await ctx.db.get(conversation.contactSessionId)
+        if(!contactSession){
+            throw new ConvexError({
+                code: "NOT_FOUND",
+                message:"Contact Session Not Found!"
+            })
+        }
+
+        return {
+            ...conversation,
+            contactSession
+        }
+    }
+})
+
 export const getMany = query({
     args:{
         paginationOpts: paginationOptsValidator,
@@ -29,6 +136,13 @@ export const getMany = query({
         }
 
         const orgId = identity.orgId as string
+
+        if(!orgId){
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message:"Organization Not Found!"
+            })
+        }
 
         let conversations: PaginationResult<Doc<"conversations">>
 
@@ -65,7 +179,8 @@ export const getMany = query({
 
                 const messages = await supportAgent.listMessages(ctx, {
                     threadId: conversation.threadId,
-                    paginationOpts: {numItems:1, cursor:null}
+                    paginationOpts: {numItems:1, cursor:null},
+                    excludeToolMessages: true
                 })
 
                 if(messages.page.length > 0){

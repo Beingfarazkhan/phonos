@@ -33,7 +33,7 @@ export const WidgetFooter = () => {
             {/* Buttons (on top of the curved div) */}
             <Button
                 size="icon"
-                variant="ghost"
+                variant="transparent"
                 onClick={() => setScreen("selection")}
                 className={cn(
                     "group flex-1 h-full relative z-10 transition-colors duration-300 ",
@@ -45,7 +45,7 @@ export const WidgetFooter = () => {
 
             <Button
                 size="icon"
-                variant="ghost"
+                variant="transparent"
                 onClick={() => setScreen("inbox")}
                 className={cn(
                     "group flex-1 h-full relative z-10 transition-colors duration-300",

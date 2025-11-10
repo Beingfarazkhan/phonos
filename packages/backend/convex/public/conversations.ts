@@ -35,7 +35,8 @@ export const getMany = query({
 
                 const messages = await supportAgent.listMessages(ctx, {
                     threadId: conversation.threadId,
-                    paginationOpts: {numItems:1, cursor:null}
+                    paginationOpts: {numItems:1, cursor:null},
+                    excludeToolMessages:true
                 })
 
                 if(messages.page.length > 0){

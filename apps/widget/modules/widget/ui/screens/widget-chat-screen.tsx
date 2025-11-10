@@ -116,12 +116,12 @@ export const WidgetChatScreen = () => {
             <WidgetHeader className="rounded-b-2xl p-4">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-x-2">
-                        <Button size={"icon"} variant={"ghost"} onClick={goToSelection}>
+                        <Button size={"icon"} variant={"transparent"} onClick={goToSelection}>
                             <ArrowLeftIcon />
                         </Button>
                         <p >Chat</p>
                     </div>
-                    <Button size={"icon"} variant={"ghost"}>
+                    <Button size={"icon"} variant={"transparent"}>
                         <MenuIcon />
                     </Button>
                 </div>
@@ -174,6 +174,7 @@ export const WidgetChatScreen = () => {
                                 onChange={field.onChange}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter" && !e.shiftKey) {
+                                        e.preventDefault()
                                         form.handleSubmit(submitHandler)()
                                     }
                                 }}
