@@ -262,7 +262,7 @@ export const ConversationIdViewLoading = () => {
             const widths = ['w-48', 'w-60', 'w-72']
             const width = widths[idx % widths.length]
             return (
-              <div className={cn(
+              <div key={idx} className={cn(
                 'group flex w-full items-end justify-end gap-2 py-2 [&>div]:max-w-[80%]',
                 isUser ? 'is-user' : 'is-assistant flex-row-reverse'
               )}>
