@@ -3,7 +3,7 @@ import {z} from 'zod'
 import { supportAgent } from "../agents/supportAgent";
 import { internal } from "../../../_generated/api";
 
-export const escalateConversation = createTool({
+export const escalateConversationTool = createTool({
   description:"Escalate a conversation.",
   args: z.object({}),
   handler: async(ctx)=>{

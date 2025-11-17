@@ -1,18 +1,29 @@
 import { ConvexError, v } from "convex/values";
-import {contentHashFromArrayBuffer, guessMimeTypeFromContents, guessMimeTypeFromExtension, vEntryId} from '@convex-dev/rag'
-import { action, mutation } from "../_generated/server";
+import {contentHashFromArrayBuffer, Entry, EntryId, guessMimeTypeFromContents, guessMimeTypeFromExtension, vEntryId} from '@convex-dev/rag'
+import { action, mutation, query, QueryCtx } from "../_generated/server";
 import { extractTextContent } from "../lib/extractTextContent";
 import rag from "../system/ai/rag";
 import { Id } from "../_generated/dataModel";
+import { paginationOptsValidator } from "convex/server";
 
-
-function guessMimeType(fileName: string, bytes: ArrayBuffer): string{
-  return (
-    guessMimeTypeFromExtension(fileName) ||
-    guessMimeTypeFromContents(bytes) || 
-    "application/octet-stream"
-) 
+export type PublicFile = {
+  id: EntryId,
+  name: string,
+  type: string,
+  size: string,
+  status: "ready" | "processing" | "error",
+  url: string | null,
+  category?: string
 }
+
+export type EntryMetadata = {
+  storageId: Id<"_storage">,
+  uploadedBy: string,
+  fileName: string,
+  category: string | null
+}
+
+
 
 export const addFile = action({
   args:{
@@ -64,7 +75,7 @@ export const addFile = action({
         uploadedBy: orgId,
         fileName,
         category: category ?? null
-      },
+      } as EntryMetadata,
       contentHash: await contentHashFromArrayBuffer(bytes)
     }
     )
@@ -144,3 +155,123 @@ export const deleteFile = mutation({
 
   }
 })
+
+export const list = query({
+  args:{
+    category: v.optional(v.string()),
+    paginationOpts: paginationOptsValidator
+  },
+  handler: async(ctx, args) =>{
+    const identity = await ctx.auth.getUserIdentity()
+
+    if(identity===null){
+      throw new ConvexError({
+        code:"UNAUTHORIZED",
+        message: "Identity not found."
+      })
+    }
+
+    const orgId = identity.orgId as string
+
+    if(!orgId){
+      throw new ConvexError({
+        code:"UNAUTHORIZED",
+        message: "Organization not found."
+      })
+    }
+    
+    const namespace = await rag.getNamespace(ctx, {
+      namespace: orgId
+    })
+
+    if(!namespace){
+      return {
+        page: [],
+        isDone: true,
+        continueCursor: ""
+      }
+    }
+
+    const results = await rag.list(ctx, {
+      namespaceId: namespace.namespaceId,
+      paginationOpts: args.paginationOpts
+    })
+
+    const files = await Promise.all(
+      results.page.map((entry)=> convertEntryToPublicFile(ctx, entry))
+    )
+
+    const filteredFiles = args.category ? files.filter((file)=>file.category===args.category) : files
+
+    return {
+      page: filteredFiles,
+      isDone: results.isDone,
+      continueCursor: results.continueCursor
+    }
+  }
+})
+
+
+function guessMimeType(fileName: string, bytes: ArrayBuffer): string{
+  return (
+    guessMimeTypeFromExtension(fileName) ||
+    guessMimeTypeFromContents(bytes) || 
+    "application/octet-stream"
+) 
+}
+
+const convertEntryToPublicFile = async(
+  ctx: QueryCtx,
+  entry: Entry
+): Promise<PublicFile> =>{
+  const metadata = entry.metadata as EntryMetadata
+  const storageId = metadata?.storageId
+
+  let fileSize = "unknown"
+  
+  if(storageId){
+    try{
+      const storageMetadata = await ctx.db.system.get(storageId)
+      if(storageMetadata){
+        fileSize = formatFileSize(storageMetadata.size)
+      }
+    }catch(err){
+      console.log('Failed to get storage metadata.', err)
+    }
+  }
+  const fileName = entry.key || "Unknown"
+  const extension = fileName.split(".").pop()?.toLowerCase() || 'txt'
+
+  let status: 'ready' | 'processing' | 'error' = 'error'
+  
+  if(entry.status==="ready"){
+    status = "ready"
+  }else if(entry.status==="pending"){
+    status = "processing"
+  }
+
+  const url = storageId? await ctx.storage.getUrl(storageId) : null
+
+  return {
+    id: entry.entryId,
+    name: fileName,
+    size: fileSize,
+    type: extension,
+    url,
+    status,
+    category: metadata?.category || undefined,
+  }
+
+}
+
+const formatFileSize = (bytes: number) =>{
+  if(bytes===0){
+    return '0 B'
+  }
+
+  const size = ['B', 'KB', 'MB', 'GB']
+  const k = 1024
+  const i = Math.floor(Math.log(bytes)/Math.log(k))
+
+  return `${Number.parseFloat((bytes/k**i).toFixed(1))} ${size[i]}`
+}
