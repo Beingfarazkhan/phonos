@@ -1,0 +1,124 @@
+import { useState } from 'react'
+
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardFooter,
+  CardTitle
+} from '@workspace/ui/components/card'
+
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@workspace/ui/components/tabs'
+
+import { Button } from '@workspace/ui/components/button'
+import Image from 'next/image'
+import { Bot, PhoneIcon, SettingsIcon, UnplugIcon } from 'lucide-react'
+import Link from 'next/link'
+import { VapiPhoneNumbersTab } from '../components/vapi-phone-numbers-tab'
+import { VapiAssistantsTab } from '../components/vapi-assistants-tab'
+
+
+type VapiConnectedViewProps = {
+  onDisconnect: () => void
+}
+
+export const VapiConnectedView = ({
+  onDisconnect
+}: VapiConnectedViewProps) => {
+  const [activeTab, setActiveTab] = useState('phone-numbers')
+
+  return (
+    <div className='space-y-6'>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className='flex items-center gap-4'>
+              <Image
+                alt='Vapi'
+                src={'/vapi.svg'}
+                height={48}
+                width={48}
+                className='rounded-lg object-contain bg-black shadow-md'
+              />
+              <div>
+                <CardTitle>Vapi Integrations</CardTitle>
+                <CardDescription>
+                  Manage your phone numbers and AI assistants
+                </CardDescription>
+              </div>
+            </div>
+            <Button
+              onClick={onDisconnect}
+              variant={'destructive'}
+              size={'sm'}
+            >
+              <UnplugIcon />
+              Disconnect
+            </Button>
+          </div>
+        </CardHeader>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-4'>
+              <div className='flex size-12 items-center justify-center rounded-lg border bg-muted'>
+                <SettingsIcon className='size-6 text-muted-foreground' />
+              </div>
+              <div>
+                <CardTitle>Widget Configuration</CardTitle>
+                <CardDescription>
+                  Setup voice calls for your chat widget
+                </CardDescription>
+              </div>
+            </div>
+            <Button
+              asChild
+            >
+              <Link href={'/customization'}>
+                <SettingsIcon />
+                Configure
+              </Link>
+            </Button>
+          </div>
+        </CardHeader>
+      </Card>
+
+      <div className='overflow-hidden rounded-lg shadow-md border bg-background'>
+        <Tabs
+          className='gap-0'
+          defaultValue='phone-numbers'
+          onValueChange={setActiveTab}
+          value={activeTab}
+        >
+          <TabsList className='grid grid-cols-2 h-12 w-full p-0'>
+            <TabsTrigger className='h-full rounded-none' value='phone-numbers'>
+              <PhoneIcon />
+              Phone Numbers
+            </TabsTrigger>
+            <TabsTrigger className='h-full rounded-none' value='assistants'>
+              <Bot />
+              Assistants
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value='phone-numbers'>
+            <VapiPhoneNumbersTab />
+          </TabsContent>
+          <TabsContent value='assistants'>
+            <VapiAssistantsTab />
+          </TabsContent>
+        </Tabs>
+      </div>
+
+    </div>
+  )
+
+}
