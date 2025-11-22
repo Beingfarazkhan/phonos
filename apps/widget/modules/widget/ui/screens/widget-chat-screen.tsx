@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeftIcon, ChevronRightIcon, Hand, MenuIcon, MessageSquareTextIcon } from "lucide-react"
 import { WidgetHeader } from "../components/widget-header"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { contactSessionIdAtomFamily, conversationIdAtom, errorMessageAtom, organizationIdAtom, screenAtom } from "../../atoms/widget-atom"
+import { contactSessionIdAtomFamily, conversationIdAtom, errorMessageAtom, organizationIdAtom, screenAtom, widgetSettingsAtom } from "../../atoms/widget-atom"
 import { useAction, useQuery } from "convex/react"
 import { useThreadMessages, toUIMessages } from '@convex-dev/agent/react'
 
@@ -39,8 +39,14 @@ import {
     AIInputToolbar,
     AIInputTools
 } from '@workspace/ui/components/ai/input'
+
+import {
+    AISuggestion,
+    AISuggestions
+} from '@workspace/ui/components/ai/suggestion'
+
 import { useForm } from "react-hook-form"
-import { fi } from "zod/v4/locales"
+import { useMemo } from "react"
 
 const formSchema = z.object({
     message: z.string().min(1, "Message is required.")
@@ -53,11 +59,25 @@ export const WidgetChatScreen = () => {
     const [conversationId, setConversationId] = useAtom(conversationIdAtom)
     const contactSessionId = useAtomValue(contactSessionIdAtomFamily(organizationId || ""))
     const setScreen = useSetAtom(screenAtom)
+    const widgetSettings = useAtomValue(widgetSettingsAtom)
 
     const goToSelection = () => {
         setConversationId(null)
         setScreen("selection")
     }
+
+    const suggestions = useMemo(() => {
+        if (!widgetSettings) {
+            return []
+        }
+
+        return Object.keys(widgetSettings.defaultSuggestion).map((key) => {
+            return widgetSettings.defaultSuggestion[
+                key as keyof typeof widgetSettings.defaultSuggestion
+            ]
+        })
+
+    }, [widgetSettings])
 
     const conversation = useQuery(
         api.public.conversations.getOne,
@@ -158,6 +178,33 @@ export const WidgetChatScreen = () => {
                     })}
                 </AIConversationContent>
             </AIConversation>
+
+            {toUIMessages(messages.results ?? []).length === 1 && (
+
+                <AISuggestions className="flex flex-col w-full items-end p-3">
+                    {suggestions.map((suggestion) => {
+                        if (!suggestion) {
+                            return null
+                        }
+
+                        return (
+                            <AISuggestion
+                                key={suggestion}
+                                suggestion={suggestion}
+                                onClick={() => {
+                                    form.setValue("message", suggestion, {
+                                        shouldValidate: true,
+                                        shouldDirty: true,
+                                        shouldTouch: true
+                                    })
+
+                                    form.handleSubmit(submitHandler)()
+                                }}
+                            />
+                        )
+                    })}
+                </AISuggestions>
+            )}
 
             <Form {...form}>
                 <AIInput
